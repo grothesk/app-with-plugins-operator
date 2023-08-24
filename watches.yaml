@@ -1,0 +1,10 @@
+---
+# Use the 'create api' subcommand to add watches to this file.
+- version: v1alpha1
+  group: applications.grothesk.io
+  kind: AppWithPlugins
+  role: appwithplugins
+  reconcilePeriod: 0s
+  # Watching dependent resources is not an option because of scaling
+  watchDependentResources: false
+#+kubebuilder:scaffold:watch

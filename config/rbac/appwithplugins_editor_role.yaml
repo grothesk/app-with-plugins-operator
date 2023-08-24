@@ -1,0 +1,31 @@
+# permissions for end users to edit appwithplugins.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: appwithplugins-editor-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: app-with-plugins-operator
+    app.kubernetes.io/part-of: app-with-plugins-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: appwithplugins-editor-role
+rules:
+- apiGroups:
+  - applications.grothesk.io
+  resources:
+  - appwithplugins
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - applications.grothesk.io
+  resources:
+  - appwithplugins/status
+  verbs:
+  - get

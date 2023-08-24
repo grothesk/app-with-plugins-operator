@@ -1,0 +1,77 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: appwithplugins.applications.grothesk.io
+spec:
+  group: applications.grothesk.io
+  names:
+    kind: AppWithPlugins
+    listKind: AppWithPluginsList
+    plural: appwithplugins
+    singular: appwithplugins
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: AppWithPlugins is the Schema for the appwithplugins API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: Spec defines the desired state of AppWithPlugins
+            type: object
+            x-kubernetes-preserve-unknown-fields: true
+            properties:
+              services:
+                description: List of services
+                type: array 
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string 
+                    image: 
+                      type: string 
+                    plugins:
+                      type: array 
+                      items:
+                        type: object
+                        properties:
+                          name: 
+                            type: string
+                          version:
+                            type: string
+              pluginStore: 
+                description: List of plugins
+                type: object
+                properties:
+                  plugins:
+                    type: array
+                    items: 
+                      type: object
+                      properties: 
+                        name:
+                          type: string 
+                        version:
+                          type: string 
+          status:
+            description: Status defines the observed state of AppWithPlugins
+            type: object
+            x-kubernetes-preserve-unknown-fields: true
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

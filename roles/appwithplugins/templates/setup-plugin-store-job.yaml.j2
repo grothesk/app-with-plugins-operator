@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: setup-plugin-store
+  namespace: "{{ ansible_operator_meta.namespace }}"
+spec:
+  ttlSecondsAfterFinished: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - image: busybox:latest
+        name: setup-plugin-store
+        command:
+        - /bin/sh
+        - -c
+        args:
+        - "/scripts/setup.sh"
+        volumeMounts:
+        - name: share 
+          mountPath: /share
+        - name: scripts
+          mountPath: /scripts
+      volumes:
+      - name: share
+        persistentVolumeClaim:
+          claimName: share
+      - name: scripts
+        configMap:
+          defaultMode: 0550
+          name: setup-plugin-store

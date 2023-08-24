@@ -1,0 +1,67 @@
+---
+# tasks file for AppWithPlugins
+- name: Manage Share PVC
+  kubernetes.core.k8s:
+    state: present
+    template: "templates/share-pvc.yaml.j2"
+
+- name: Manage ConfigMaps for loading the plugins
+  kubernetes.core.k8s:
+    state: present
+    template: "templates/load-plugins-configmap.yaml.j2"
+  loop: "{{ services }}"
+
+- name: Manage Services 
+  kubernetes.core.k8s:
+    state: present
+    template: "templates/services-deployment.yaml.j2"
+  loop: "{{ services }}"
+
+- name: Wait for services deployments to scale down
+  k8s_info:
+    api_version: "v1"
+    kind: Pod
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    label_selectors:
+      - app = appwithplugin
+  register: pods_list
+  until: pods_list.resources | length == 0
+  retries: 10
+  delay: 10
+
+- debug:
+    var: pods_list
+
+- name: Manage ConfigMap for setting up the pluginStore
+  kubernetes.core.k8s:
+    state: present
+    template: "templates/setup-plugin-store-configmap.yaml.j2"
+
+- name: Setup pluginStore
+  kubernetes.core.k8s:
+    state: present
+    template: "templates/setup-plugin-store-job.yaml.j2"
+  loop: "{{ services }}"
+
+- name: Wait for pluginStore setup to finish
+  k8s_info:
+    api_version: "batch/v1"
+    kind: Job
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    name: setup-plugin-store
+  register: jobs_list
+  until: jobs_list.resources | length == 0
+  retries: 10
+  delay: 10
+
+- name: Scale services back to one
+  kubernetes.core.k8s_scale:
+    api_version: apps/v1
+    kind: deployment
+    name: "{{ item.name }}"
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    replicas: 1
+  loop: "{{ services }}"
+
+- debug:
+    var: pods_list

@@ -1,0 +1,34 @@
+apiVersion: applications.grothesk.io/v1alpha1
+kind: AppWithPlugins
+metadata:
+  labels:
+    app.kubernetes.io/name: appwithplugins
+    app.kubernetes.io/instance: appwithplugins-sample
+    app.kubernetes.io/part-of: app-with-plugins-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: app-with-plugins-operator
+  name: appwithplugins-sample
+spec:
+  services:
+    - name: service-0
+      image: busybox:latest
+      plugins:
+        - name: A
+          version: 1.0.0
+        - name: C
+          version: 1.0.0 
+    - name: service-1
+      image: busybox:latest
+      plugins:
+        - name: B
+          version: 1.0.0
+        - name: C
+          version: 1.0.0
+  pluginStore:
+    plugins:
+      - name: A
+        version: 1.0.0
+      - name: B
+        version: 1.0.0    
+      - name: C
+        version: 1.0.0

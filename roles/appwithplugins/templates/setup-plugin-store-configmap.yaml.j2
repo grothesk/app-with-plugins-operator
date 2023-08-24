@@ -1,0 +1,17 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: setup-plugin-store
+  namespace: "{{ ansible_operator_meta.namespace }}"
+data:
+  setup.sh: |
+    #!/bin/sh
+    set -e
+    echo "Setup Plugin Store..."
+    echo "Cleaning up."
+    rm -f /share/*
+    echo "Provide Plugins."
+    {% for plugin in plugin_store.plugins %}
+    echo "Provide version {{ plugin.version }} of the {{ plugin.name }} plugin. In the future, this step may include making changes to a database etc. For now it is just about creating a text file which can be printed out by the consuming services."
+    echo "Load version {{ plugin.version }} of the {{ plugin.name }} plugin." > /share/{{ plugin.name }}-{{ plugin.version }}.txt
+    {% endfor %}

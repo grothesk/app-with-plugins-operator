@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: "{{ item.name }}"
+    app: appwithplugin
+  name: "{{ item.name }}"
+  namespace: "{{ ansible_operator_meta.namespace }}"
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      service: "{{ item.name }}"
+  template:
+    metadata:
+      labels:
+        service: "{{ item.name }}"
+        app: appwithplugin
+    spec:
+      containers:
+      - image: "{{ item.image }}"
+        name: "{{ item.name }}"
+        command:
+        - /bin/sh
+        - -c
+        args:
+        - "/scripts/load-plugins.sh"
+        volumeMounts:
+        - name: share 
+          mountPath: /share
+        - name: scripts 
+          mountPath: /scripts
+      volumes:
+      - name: share
+        persistentVolumeClaim:
+          claimName: share
+      - name: scripts
+        configMap:
+          defaultMode: 0550
+          name: "load-plugins-{{ item.name }}"
